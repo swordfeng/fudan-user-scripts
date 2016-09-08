@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Elearning Keep-Alive
-// @namespace    http://elearning.fudan.edu.cn/
+// @namespace    http://swordfeng.xyz/
 // @version      0.1
 // @description  Keep E-Learning Site alive!
 // @author       swordfeng
