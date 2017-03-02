@@ -1,15 +1,31 @@
 // ==UserScript==
 // @name         Fudan UIS Login
 // @namespace    https://swordfeng.xyz/
-// @version      0.2
+// @version      0.2.1
 // @description  Save password and auto login! Portal login page is redirected to UIS login.
 // @author       swordfeng
 // @match        *://*.fudan.edu.cn/*
 // @grant        none
 // ==/UserScript==
 
-function loginExec(elements) {
-    let {userinput, passinput, savepassinput, autologininput, loginbutton} = elements;
+function loginPage() {
+    'use strict';
+
+    let userinput = document.getElementById('IDToken1');
+    let passinput = document.getElementById('IDToken2');
+
+    // append 'save password' checkbox
+    let textstyle = 'font-size:14px;color:#11295C;font-family:serif;font-weight:700;';
+    let tableunit = passinput.parentElement.parentElement.nextElementSibling.children[0];
+    tableunit.align = 'center';
+    tableunit.innerHTML = `<input type="checkbox" id="save_password"><label for="save_password" style="${textstyle}">保存密码</label>`;
+    tableunit.innerHTML += '&nbsp;';
+    tableunit.innerHTML += `<input type="checkbox" id="auto_login"><label for="auto_login" style="${textstyle}">自动登录</label>`;
+
+    let savepassinput = document.getElementById('save_password');
+    let autologininput = document.getElementById('auto_login');
+
+    let loginbutton = Array.prototype.filter.call(document.getElementsByTagName('img'), x => x.src.match(/login/))[0];
 
     let config = loadConfig();
     if (config.savePassword) {
@@ -33,30 +49,9 @@ function loginExec(elements) {
             config.user = '';
             config.password = '';
         }
+        console.log(config);
         saveConfig(config);
     });
-}
-
-function loginPage() {
-    'use strict';
-
-    let userinput = document.getElementById('IDToken1');
-    let passinput = document.getElementById('IDToken2');
-
-    // append 'save password' checkbox
-    let textstyle = 'font-size:14px;color:#11295C;font-family:serif;font-weight:700;';
-    let tableunit = passinput.parentElement.parentElement.nextElementSibling.children[0];
-    tableunit.align = 'center';
-    tableunit.innerHTML = `<input type="checkbox" id="save_password"><label for="save_password" style="${textstyle}">保存密码</label>`;
-    tableunit.innerHTML += '&nbsp;';
-    tableunit.innerHTML += `<input type="checkbox" id="auto_login"><label for="auto_login" style="${textstyle}">自动登录</label>`;
-
-    let savepassinput = document.getElementById('save_password');
-    let autologininput = document.getElementById('auto_login');
-
-    let loginbutton = Array.prototype.filter.call(document.getElementsByTagName('img'), x => x.src.match(/login/))[0];
-
-    loginExec({userinput, passinput, savepassinput, autologininput, loginbutton});
 }
 
 function logoutPage() {
@@ -84,8 +79,31 @@ function loginPortal() {
     let autologininput = document.getElementById('auto_login');
 
     let loginbutton = document.getElementsByClassName('IDCheckLoginBtn')[0];
+    
+    let config = loadConfig();
+    if (config.savePassword) {
+        savepassinput.checked = true;
+        userinput.value = config.user;
+        passinput.value = config.password;
+        if (config.autoLogin) {
+            autologininput.checked = true;
+        }
+    }
 
-    loginExec({userinput, passinput, savepassinput, autologininput, loginbutton});
+    // save config when unload
+    window.addEventListener('beforeunload', function () {
+        config.savePassword = savepassinput.checked;
+        config.autoLogin = autologininput.checked;
+        if (config.savePassword) {
+            config.user = userinput.value;
+            config.password = passinput.value;
+        } else {
+            config.user = '';
+            config.password = '';
+        }
+        console.log(config);
+        saveConfig(config);
+    });
 }
 
 function loadConfig() {
