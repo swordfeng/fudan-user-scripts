@@ -1,31 +1,15 @@
 // ==UserScript==
 // @name         Fudan UIS Login
 // @namespace    https://swordfeng.xyz/
-// @version      0.1
+// @version      0.2
 // @description  Save password and auto login! Portal login page is redirected to UIS login.
 // @author       swordfeng
 // @match        *://*.fudan.edu.cn/*
 // @grant        none
 // ==/UserScript==
 
-function loginPage() {
-    'use strict';
-
-    let userinput = document.getElementById('IDToken1');
-    let passinput = document.getElementById('IDToken2');
-
-    // append 'save password' checkbox
-    let textstyle = 'font-size:14px;color:#11295C;font-family:serif;font-weight:700;';
-    let tableunit = passinput.parentElement.parentElement.nextElementSibling.children[0];
-    tableunit.align = 'center';
-    tableunit.innerHTML = `<input type="checkbox" id="save_password"><label for="save_password" style="${textstyle}">保存密码</label>`;
-    tableunit.innerHTML += '&nbsp;';
-    tableunit.innerHTML += `<input type="checkbox" id="auto_login"><label for="auto_login" style="${textstyle}">自动登录</label>`;
-
-    let savepassinput = document.getElementById('save_password');
-    let autologininput = document.getElementById('auto_login');
-
-    let loginbutton = Array.prototype.filter.call(document.getElementsByTagName('img'), x => x.src.match(/login/))[0];
+function loginExec(elements) {
+    let {userinput, passinput, savepassinput, autologininput, loginbutton} = elements;
 
     let config = loadConfig();
     if (config.savePassword) {
@@ -53,6 +37,28 @@ function loginPage() {
     });
 }
 
+function loginPage() {
+    'use strict';
+
+    let userinput = document.getElementById('IDToken1');
+    let passinput = document.getElementById('IDToken2');
+
+    // append 'save password' checkbox
+    let textstyle = 'font-size:14px;color:#11295C;font-family:serif;font-weight:700;';
+    let tableunit = passinput.parentElement.parentElement.nextElementSibling.children[0];
+    tableunit.align = 'center';
+    tableunit.innerHTML = `<input type="checkbox" id="save_password"><label for="save_password" style="${textstyle}">保存密码</label>`;
+    tableunit.innerHTML += '&nbsp;';
+    tableunit.innerHTML += `<input type="checkbox" id="auto_login"><label for="auto_login" style="${textstyle}">自动登录</label>`;
+
+    let savepassinput = document.getElementById('save_password');
+    let autologininput = document.getElementById('auto_login');
+
+    let loginbutton = Array.prototype.filter.call(document.getElementsByTagName('img'), x => x.src.match(/login/))[0];
+
+    loginExec({userinput, passinput, savepassinput, autologininput, loginbutton});
+}
+
 function logoutPage() {
     let config = loadConfig();
     config.autoLogin = false;
@@ -60,7 +66,26 @@ function logoutPage() {
 }
 
 function loginPortal() {
-    window.location = 'https://uis1.fudan.edu.cn/amserver/UI/Login?goto=http://portal.fudan.edu.cn/ehome/index.do';
+    let userinput = document.getElementById('username');
+    let passinput = document.getElementById('password');
+
+    // append div
+    passinput.outerHTML += '<div id="utilbox"></div>';
+
+    // append 'save password' checkbox
+    let textstyle = 'font-size:14px;color:#666666;font-family:serif;font-weight:700;';
+    let tableunit = document.getElementById('utilbox');
+    tableunit.align = 'center';
+    tableunit.innerHTML = `<input type="checkbox" id="save_password"><label for="save_password" style="${textstyle}">保存密码</label>`;
+    tableunit.innerHTML += '&nbsp;';
+    tableunit.innerHTML += `<input type="checkbox" id="auto_login"><label for="auto_login" style="${textstyle}">自动登录</label>`;
+
+    let savepassinput = document.getElementById('save_password');
+    let autologininput = document.getElementById('auto_login');
+
+    let loginbutton = document.getElementsByClassName('IDCheckLoginBtn')[0];
+
+    loginExec({userinput, passinput, savepassinput, autologininput, loginbutton});
 }
 
 function loadConfig() {
@@ -87,7 +112,7 @@ function saveConfig(config) {
 (function () {
     const loginpath = /uis\d.fudan.edu.cn\/amserver\/UI\/Login/;
     const logoutpath = /uis\d.fudan.edu.cn\/amserver\/UI\/Logout/;
-    const loginportalpath = 'portal.fudan.edu.cn/main/loginIndex.do';
+    const loginportalpath = 'uis.fudan.edu.cn/authserver/login';
     let path = location.hostname + location.pathname;
     if (path.match(loginpath)) loginPage();
     else if (path.match(logoutpath)) logoutPage();
