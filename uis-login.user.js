@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Fudan UIS Login
 // @namespace    https://swordfeng.xyz/
-// @version      0.2.2
+// @version      0.2.3
 // @description  Save password and auto login! Portal login page is redirected to UIS login.
 // @author       swordfeng
 // @match        *://*.fudan.edu.cn/*
@@ -131,9 +131,12 @@ function saveConfig(config) {
 (function () {
     const loginpath = /uis\d.fudan.edu.cn\/amserver\/UI\/Login/;
     const logoutpath = /uis\d.fudan.edu.cn\/amserver\/UI\/Logout/;
-    const loginportalpath = 'uis.fudan.edu.cn/authserver/login';
+    const portalpath = 'uis.fudan.edu.cn/authserver/login';
     let path = location.hostname + location.pathname;
     if (path.match(loginpath)) loginPage();
     else if (path.match(logoutpath)) logoutPage();
-    else if (path.match(loginportalpath)) loginPortal();
+    else if (path.match(portalpath)) {
+        if (location.search.match('logout')) logoutPage();
+        else loginPortal();
+    }
 })();
