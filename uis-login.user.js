@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Fudan UIS Login
 // @namespace    https://swordfeng.xyz/
-// @version      0.2.1
+// @version      0.2.2
 // @description  Save password and auto login! Portal login page is redirected to UIS login.
 // @author       swordfeng
 // @match        *://*.fudan.edu.cn/*
@@ -49,7 +49,6 @@ function loginPage() {
             config.user = '';
             config.password = '';
         }
-        console.log(config);
         saveConfig(config);
     });
 }
@@ -61,11 +60,11 @@ function logoutPage() {
 }
 
 function loginPortal() {
+    // append div
+    document.getElementById('password').outerHTML += '<div id="utilbox"></div>';
+    
     let userinput = document.getElementById('username');
     let passinput = document.getElementById('password');
-
-    // append div
-    passinput.outerHTML += '<div id="utilbox"></div>';
 
     // append 'save password' checkbox
     let textstyle = 'font-size:14px;color:#666666;font-family:serif;font-weight:700;';
@@ -87,6 +86,9 @@ function loginPortal() {
         passinput.value = config.password;
         if (config.autoLogin) {
             autologininput.checked = true;
+            if (document.getElementById('cpatchaDiv').innerHTML.trim() === '') {
+                loginbutton.click();
+            }
         }
     }
 
@@ -101,7 +103,6 @@ function loginPortal() {
             config.user = '';
             config.password = '';
         }
-        console.log(config);
         saveConfig(config);
     });
 }
