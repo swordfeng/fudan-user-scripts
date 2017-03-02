@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Fudan UIS Login
 // @namespace    https://swordfeng.xyz/
-// @version      0.2.4
+// @version      0.2.5
 // @description  Save password and auto login! Portal login page is redirected to UIS login.
 // @author       swordfeng
 // @match        *://*.fudan.edu.cn/*
@@ -90,7 +90,7 @@ function loginPortal() {
                 loginbutton.click();
             } else {
                 eraseCookie('JSESSIONID');
-                location.reload();
+                location = location;
             }
         }
     }
